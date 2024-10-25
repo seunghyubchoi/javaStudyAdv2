@@ -15,12 +15,6 @@ public class ClientV1 {
         log("클라이언트 시작");
         Socket socket = new Socket("localhost", PORT);
 
-        /*
-        그냥 쓰진 않음
-        socket.getInputStream(); // 외부에서 받기 위해 사용
-        socket.getOutputStream(); // 외부로 보내기 위해 사용
-        */
-
         DataInputStream input = new DataInputStream(socket.getInputStream());
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
         log("소켓 연결 : " + socket);
