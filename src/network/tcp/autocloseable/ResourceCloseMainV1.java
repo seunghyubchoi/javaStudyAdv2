@@ -5,8 +5,10 @@ public class ResourceCloseMainV1 {
         try {
             logic();
         } catch (CallException e) {
+            System.out.println("CallException 예외 처리");
             throw new RuntimeException(e);
         } catch (CloseException e) {
+            System.out.println("CloseException 예외 처리");
             throw new RuntimeException(e);
         }
     }
