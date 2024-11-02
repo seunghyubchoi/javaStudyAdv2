@@ -5,7 +5,10 @@ import chat.util.SocketUtil;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.security.SecureRandom;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.UUID;
 
 import static util.MyLogger.log;
 
@@ -15,6 +18,7 @@ public class Client {
         Socket socket = null;
         DataInputStream input = null;
         DataOutputStream output = null;
+
 
         try {
             socket = new Socket("localhost", 12345);
@@ -33,7 +37,9 @@ public class Client {
 
                 output.writeUTF(msgToServer);
 
+                String msgFromServer = input.readUTF();
 
+                log(msgFromServer);
             }
         } catch (IOException e) {
             log("Client Exception Occurred...........");
@@ -43,9 +49,6 @@ public class Client {
             SocketUtil.closeResources(output, input, socket);
             log("클라이언트 자원 정리 완료");
         }
-
-
-
-
     }
+
 }

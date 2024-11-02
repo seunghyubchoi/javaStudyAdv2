@@ -33,7 +33,7 @@ public class Session implements Runnable {
                     break;
                 }
                 log(message);
-                output.writeUTF(socket + " : " + message);
+                output.writeUTF(message);
             }
         } catch (IOException e) {
             log("Session Error Occurred................");
