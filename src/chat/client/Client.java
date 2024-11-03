@@ -13,42 +13,46 @@ import java.util.UUID;
 import static util.MyLogger.log;
 
 public class Client {
-    public static void main(String[] args) throws IOException {
+    private final String host;
+    private final int port;
 
-        Socket socket = null;
-        DataInputStream input = null;
-        DataOutputStream output = null;
+    private Socket socket;
+    private DataInputStream input;
+    private DataOutputStream output;
 
+    private ReadHandler readHandler;
+    private WriteHandler writeHandler;
+    private boolean closed = false;
 
-        try {
-            socket = new Socket("localhost", 12345);
-            input = new DataInputStream(socket.getInputStream());
-            output = new DataOutputStream(socket.getOutputStream());
-            log("서버와 연결");
-
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print("전송 문자 : ");
-                String msgToServer = scanner.nextLine();
-
-                if(msgToServer.equals("exit")){
-                    break;
-                }
-
-                output.writeUTF(msgToServer);
-
-                String msgFromServer = input.readUTF();
-
-                log(msgFromServer);
-            }
-        } catch (IOException e) {
-            log("Client Exception Occurred...........");
-            log(e);
-        } finally {
-            log("클라이언트 자원 정리");
-            SocketUtil.closeResources(output, input, socket);
-            log("클라이언트 자원 정리 완료");
-        }
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
 
+    public void start() throws IOException {
+        log("클라이언트 시작");
+        socket = new Socket(host, port);
+        input = new DataInputStream(socket.getInputStream());
+        output = new DataOutputStream(socket.getOutputStream());
+
+        readHandler = new ReadHandler(input, this);
+        writeHandler = new WriteHandler(output, this);
+
+        Thread readThread = new Thread(readHandler, "readHandler");
+        Thread writeThread = new Thread(writeHandler, "writeHandler");
+
+        readThread.start();
+        writeThread.start();
+    }
+
+    public synchronized void close() {
+        if (closed) {
+            return;
+        }
+        writeHandler.close();
+        readHandler.close();
+        SocketUtil.closeResources(output, input, socket);
+        closed = true;
+        log("연결 종료 : " + socket);
+    }
 }
